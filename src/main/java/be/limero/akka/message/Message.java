@@ -2,12 +2,15 @@ package be.limero.akka.message;
 
 import java.util.HashMap;
 
+import akka.actor.ActorSystem;
+import akka.event.LoggingAdapter;
+
 public class Message extends HashMap<String, Object> {
 	/**
 	 * 
 	 */
-	public static final java.util.logging.Logger log = java.util.logging.Logger
-			.getLogger(Message.class.getName());
+	private final LoggingAdapter log =akka.event.Logging.getLogger(ActorSystem.create("iot-system"),this);
+
 	private static final long serialVersionUID = 1L;
 
 	public static Message create(String key, String value) {
@@ -17,7 +20,6 @@ public class Message extends HashMap<String, Object> {
 	}
 
 	public boolean hasKeyValue(String key, String value) {
-		log.info(" matchKeyValue('"+key+"','"+value+"' against :"+this);
 		return containsKey(key) && ((String) get(key)).compareTo(value) == 0;
 	}
 

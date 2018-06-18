@@ -1,15 +1,14 @@
 package be.limero.akka.message;
 
 import java.util.HashMap;
-
-import akka.actor.ActorSystem;
-import akka.event.LoggingAdapter;
+import java.util.logging.Logger;
 
 public class Message extends HashMap<String, Object> {
 	/**
 	 * 
 	 */
-	private final LoggingAdapter log =akka.event.Logging.getLogger(ActorSystem.create("iot-system"),this);
+	static private Logger log= Logger.getLogger(Message.class.getName());
+//	private final LoggingAdapter log =akka.event.Logging.getLogger(ActorSystem.create("iot-system"),this);
 
 	private static final long serialVersionUID = 1L;
 

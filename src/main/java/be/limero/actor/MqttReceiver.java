@@ -67,8 +67,8 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 
 	static void initActor() {
 
-		supervisor = system.actorOf(IotSupervisor.props(), "iot-supervisor");
-		slave = system.actorOf(IotSlave.props(), "slave");
+	//	supervisor = system.actorOf(IotSupervisor.props(), "iot-supervisor");
+	//	slave = system.actorOf(IotSlave.props(), "slave");
 		distanceListener = system.actorOf(DistanceListener.props(), "distance-listener");
 	}
 
@@ -86,6 +86,10 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 			System.out.println("MQTT failed" + ex);
 		}
 
+	}
+	
+	public MqttReceiver() {
+		log.info(" new MqttReceiver() ");
 	}
 
 	@Override

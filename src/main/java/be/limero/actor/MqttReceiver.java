@@ -37,7 +37,7 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 		this._broker = _broker;
 	}
 
-	String _broker = "tcp://limero.ddns.net:1883";
+	String _broker = "tcp://limero.ddns.net:1883"; 
 	String _clientId = "JavaSample";
 	MemoryPersistence _persistence = new MemoryPersistence();
 
@@ -94,7 +94,7 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 
 	@Override
 	public void connectionLost(Throwable ex) {
-		log.warning("connectionLost failed", ex);
+		log.warning("connectionLost failed {}", ex);
 	}
 
 	@Override

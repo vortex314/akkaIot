@@ -14,7 +14,7 @@ public class Topic {
 		String[] part = topic.split("/");
 		int length=part.length;
 		if ( length < 4 ) {
-			log.warning(" topic not enough fields : "+topic );
+			log.warning(" topic has not enough fields : "+topic );
 			return;
 		}
 		dir = part[0];

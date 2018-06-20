@@ -1,13 +1,15 @@
 package be.limero.akka.message;
 
 import java.util.HashMap;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Message extends HashMap<String, Object> {
 	/**
 	 * 
 	 */
-	static private Logger log= Logger.getLogger(Message.class.getName());
+    static Logger log = LoggerFactory.getLogger(Message.class);
 //	private final LoggingAdapter log =akka.event.Logging.getLogger(ActorSystem.create("iot-system"),this);
 
 	private static final long serialVersionUID = 1L;
@@ -27,7 +29,7 @@ public class Message extends HashMap<String, Object> {
 			String s=(String) get(key);
 			return s;
 		} catch (Exception e) {
-			log.warning(" key="+key+" not found in message="+this);
+			log.warn(" key="+key+" not found in message="+this);
 			return "";
 		} 
 	}

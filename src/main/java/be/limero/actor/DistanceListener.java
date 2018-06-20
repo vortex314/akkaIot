@@ -1,49 +1,47 @@
 package be.limero.actor;
 
-
 import akka.actor.AbstractActor;
 import akka.actor.ActorSelection;
 import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
+import be.limero.akka.message.DataChange;
 import be.limero.akka.message.Message;
 import be.limero.akka.message.Topic;
 
 public class DistanceListener extends AbstractActor {
 
-    private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
-    
-    public DistanceListener() {
+	private final LoggingAdapter log = Logging.getLogger(getContext().getSystem(), this);
+	Bus bus;
+	Double avg = 0.0;
+
+	public DistanceListener() {
 		log.info(" new DistanceListener() ");
 	}
-    
-    void init() {
-    	ActorSelection receiver = getContext().getSystem().actorSelection("/user/mqtt-receiver");
-        receiver.tell(Message.cmd("subscribe","pattern","src/.*/dwm1000/distance"), getSelf());
-    }
 
-    @Override
-    public Receive createReceive() {
-        return receiveBuilder()
-        		.match(Message.class, msg-> msg.hasKeyValue("cmd", "init"),msg->{
-        			log.info("init");
-        			init();
-        		})
-        		.match(Message.class, msg-> msg.hasKeyValue("cmd", "mqtt/publish"),msg->{
-        			Topic topic=new Topic(msg.getString("topic"));
-        			log.info(" got distance from anchor "+ topic.device+"="+msg.getString("payload"));     			
-        		})
-                .build();
-    }
-    
-    public static Props props() {
-        return Props.create(DistanceListener.class);
-    }
-    
+	void init() {
+		bus = Bus.getBus();
+		bus.subscribe(getSelf(), "src/.*/dwm1000/distance");
+	}
+
+	@Override
+	public Receive createReceive() {
+		return receiveBuilder().match(DataChange.class, msg -> {
+			Topic topic = new Topic(msg.topic);
+			log.info(" got distance from anchor " + topic.device + "=" + msg.getDouble());
+			avg = (avg+msg.getDouble())/2;
+			bus.publish(new DataChange("src/lawnmower/distance/avg", avg.toString()));
+		}).build();
+	}
+
+	public static Props props() {
+		return Props.create(DistanceListener.class);
+	}
+
 	@Override
 	public void preStart() {
 		log.info(this.getClass().getName() + " started.");
-        init();
+		init();
 	}
 
 	@Override

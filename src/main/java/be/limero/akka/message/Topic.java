@@ -1,10 +1,12 @@
 package be.limero.akka.message;
 
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Topic {
-	static private Logger log= Logger.getLogger(Topic.class.getName());
+    static Logger log = LoggerFactory.getLogger(Message.class);
 	public String dir="";
 	public String device="";
 	public String service="";
@@ -14,7 +16,7 @@ public class Topic {
 		String[] part = topic.split("/");
 		int length=part.length;
 		if ( length < 4 ) {
-			log.warning(" topic has not enough fields : "+topic );
+			log.warn(" topic has not enough fields : "+topic );
 			return;
 		}
 		dir = part[0];

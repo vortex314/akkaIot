@@ -16,6 +16,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.event.LoggingAdapter;
+import be.limero.akka.message.DataChange;
 import be.limero.akka.message.Message;
 
 public class MqttReceiver extends AbstractActor implements MqttCallback {
@@ -28,6 +29,7 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 	static ActorRef supervisor;
 	static ActorRef slave;
 	static ActorRef distanceListener;
+	Bus bus = Bus.getBus();
 
 	public String get_broker() {
 		return _broker;
@@ -37,7 +39,7 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 		this._broker = _broker;
 	}
 
-	String _broker = "tcp://limero.ddns.net:1883"; 
+	String _broker = "tcp://limero.ddns.net:1883";
 	String _clientId = "JavaSample";
 	MemoryPersistence _persistence = new MemoryPersistence();
 
@@ -53,7 +55,7 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 			_client.subscribe("src/#");
 
 		} catch (Exception ex) {
-			log.warning("connect failed ", ex);
+			log.warning("connect failed {} ", ex);
 		}
 	}
 
@@ -61,14 +63,14 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 		try {
 			_client.disconnect();
 		} catch (MqttException ex) {
-			log.warning("MQTT failed", ex);
+			log.warning("MQTT failed {}", ex);
 		}
 	}
 
 	static void initActor() {
 
-	//	supervisor = system.actorOf(IotSupervisor.props(), "iot-supervisor");
-	//	slave = system.actorOf(IotSlave.props(), "slave");
+		// supervisor = system.actorOf(IotSupervisor.props(), "iot-supervisor");
+		// slave = system.actorOf(IotSlave.props(), "slave");
 		distanceListener = system.actorOf(DistanceListener.props(), "distance-listener");
 	}
 
@@ -83,11 +85,11 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 			me.tell(Message.cmd("connect"), me);
 
 		} catch (Exception ex) {
-			System.out.println("MQTT failed" + ex);
+			System.out.println("MQTT failed {}" + ex);
 		}
 
 	}
-	
+
 	public MqttReceiver() {
 		log.info(" new MqttReceiver() ");
 	}
@@ -99,20 +101,14 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 
 	@Override
 	public void deliveryComplete(IMqttDeliveryToken token) {
-		log.info("deliveryComplete " + token);
+//		log.info("deliveryComplete " + token);
 
 	}
 
 	@Override
 	public void messageArrived(String topic, MqttMessage msg) throws Exception {
 		String payload = new String(msg.getPayload(), "UTF-8");
-//		log.info(topic + ":" + payload);
-		for (String pattern : subscribers.keySet()) {
-			if (topic.matches(pattern)) {
-//				log.info(" informing subscriber "+subscribers.get(pattern));
-				subscribers.get(pattern).tell(Message.cmd("mqtt/publish","topic", topic,"payload",payload), getSelf());
-			}
-		}
+		bus.publish(new DataChange(topic, payload));
 	}
 
 	//
@@ -120,15 +116,14 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 	//
 	@Override
 	public Receive createReceive() {
-		return receiveBuilder().match(Message.class, m -> m.hasKeyValue("cmd", "subscribe"), m -> {
-			subscribers.put(m.getString("pattern"), getSender());
-			log.info(" added subscriber " + getSender() + " for pattern '" + m.getString("pattern") + "'");
-		}).match(Message.class, m -> m.hasKeyValue("cmd", "connect"), m -> {
+		return receiveBuilder().match(Message.class, m -> m.hasKeyValue("cmd", "connect"), m -> {
 			connect();
-		}).match(Message.class, m -> m.hasKeyValue("cmd", "publish"), m -> {
-			//TODO publish message
-		}).match(Message.class, msg -> {
-			log.info(" unhandled Message : " + msg);
+		}).match(DataChange.class, m -> {
+			MqttMessage msg = new MqttMessage();
+			msg.setPayload(m.getString().getBytes());
+			msg.setQos(0);
+			msg.setRetained(false);
+			_client.publish(m.topic, msg);
 		}).matchAny(o -> log.info(" unknown message class :" + o.getClass().getName() + "=" + o)).build();
 	}
 
@@ -139,6 +134,8 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 	@Override
 	public void preStart() {
 		log.info(this.getClass().getName() + " started.");
+		Bus.getBus().subscribe(getSelf(), "dst/.*");
+		Bus.getBus().subscribe(getSelf(), "src/lawnmower/.*");
 	}
 
 	@Override

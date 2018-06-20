@@ -101,14 +101,15 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 
 	@Override
 	public void deliveryComplete(IMqttDeliveryToken token) {
-//		log.info("deliveryComplete " + token);
+		// log.info("deliveryComplete " + token);
 
 	}
 
 	@Override
 	public void messageArrived(String topic, MqttMessage msg) throws Exception {
 		String payload = new String(msg.getPayload(), "UTF-8");
-		bus.publish(new DataChange(topic, payload));
+		if (!topic.startsWith("src/lawnmower"))
+			bus.publish(new DataChange(topic, payload));
 	}
 
 	//
@@ -124,6 +125,7 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
 			msg.setQos(0);
 			msg.setRetained(false);
 			_client.publish(m.topic, msg);
+			log.info("publish " + m.topic);
 		}).matchAny(o -> log.info(" unknown message class :" + o.getClass().getName() + "=" + o)).build();
 	}
 

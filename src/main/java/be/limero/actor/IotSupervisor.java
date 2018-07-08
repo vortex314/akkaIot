@@ -2,10 +2,9 @@ package be.limero.actor;
 
 
 import akka.actor.AbstractActor;
-import akka.actor.ActorLogging;
 import akka.actor.ActorRef;
+import akka.actor.ActorSelection;
 import akka.actor.Props;
-import akka.actor.*;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 

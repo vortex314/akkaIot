@@ -28,10 +28,10 @@ public class IotSlave extends AbstractActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(String.class,  s -> {
+                .match(String.class, s -> {
                     log.info(s);
-                    log.info(" sender : "+getSender());
-     //               Thread.sleep(100);
+                    log.info(" sender : " + getSender());
+                    //               Thread.sleep(100);
                     getSender().tell(s.toUpperCase(), self());
                 })
                 .build();

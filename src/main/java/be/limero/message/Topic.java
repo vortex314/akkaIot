@@ -1,4 +1,4 @@
-package be.limero.akka.message;
+package be.limero.message;
 
 
 import org.slf4j.Logger;
@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 
 public class Topic {
-    static Logger log = LoggerFactory.getLogger(Message.class);
+    static Logger log = LoggerFactory.getLogger(MessageJava.class);
     public String dir = "";
     public String device = "";
     public String service = "";

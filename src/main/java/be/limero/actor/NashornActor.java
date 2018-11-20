@@ -1,6 +1,6 @@
 package be.limero.actor;
 
-import be.limero.akka.message.BaseMessage;
+import be.limero.message.BaseMessage;
 
 import javax.script.*;
 import java.util.Date;

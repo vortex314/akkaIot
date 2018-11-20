@@ -1,4 +1,4 @@
-package be.limero.akka.message;
+package be.limero.message;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ public class BaseMessage {
     HashMap<String, Object> attributes = new HashMap<String, Object>();
     Object payload;
 
-    BaseMessage() {
+    public BaseMessage() {
 
     }
 

@@ -1,6 +1,6 @@
 package be.limero.actor;
 
-import be.limero.akka.message.ConfigMessage;
+import be.limero.message.ConfigMessage;
 
 public class MqttActor extends BaseActor {
     @Override

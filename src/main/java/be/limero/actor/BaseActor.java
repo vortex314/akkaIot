@@ -1,7 +1,8 @@
 package be.limero.actor;
 
 import akka.actor.AbstractActor;
-import be.limero.akka.message.ConfigMessage;
+import akka.actor.Props;
+import be.limero.message.ConfigMessage;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,16 +10,20 @@ import org.slf4j.LoggerFactory;
 public class BaseActor extends AbstractActor {
     private static Logger log = LoggerFactory.getLogger(BaseActor.class);
     State _state;
+    JsonNode _config = null;
 
     ;
-    JsonNode _config = null;
 
     BaseActor() {
         _state = State.CREATED;
     }
 
+    public static Props props() {
+        return Props.create(BaseActor.class);
+    }
+
     void init() { // read configuration and initialize actor for next messages
-        _state = STARTED;
+        _state = State.STARTED;
     }
 
     void configure(JsonNode config) {
@@ -46,4 +51,6 @@ public class BaseActor extends AbstractActor {
     public enum State {
         CREATED, CONFIGURED, STARTED, STOPPED
     }
+
+
 }

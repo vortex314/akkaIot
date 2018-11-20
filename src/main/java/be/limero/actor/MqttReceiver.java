@@ -5,8 +5,8 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.event.LoggingAdapter;
-import be.limero.akka.message.DataChange;
-import be.limero.akka.message.Message;
+import be.limero.message.DataChange;
+import be.limero.message.MessageJava;
 import be.limero.util.Bus;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
@@ -36,11 +36,10 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
             ActorRef me = system.actorOf(MqttReceiver.props(), "mqtt-receiver");
             System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
             distanceListener = system.actorOf(LocationActor.props(), "distance-listener");
-            me.tell(Message.cmd("connect"), ActorRef.noSender());
+            me.tell(MessageJava.cmd("connect"), ActorRef.noSender());
         } catch (Exception ex) {
             System.out.println("MQTT failed {}" + ex);
         }
-
     }
 
     public static Props props() {
@@ -95,8 +94,8 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Message.class, m -> m.hasKeyValue("cmd", "connect"), m -> connect())
-                .match(Message.class, m -> m.hasKeyValue("cmd", "disconnect"), m -> disconnect())
+                .match(MessageJava.class, m -> m.hasKeyValue("cmd", "connect"), m -> connect())
+                .match(MessageJava.class, m -> m.hasKeyValue("cmd", "disconnect"), m -> disconnect())
                 .match(DataChange.class, m -> {
                     MqttMessage msg = new MqttMessage();
                     msg.setPayload(m.getString().getBytes());

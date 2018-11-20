@@ -1,4 +1,4 @@
-<configuration debug="true">
+<configuration debug="false">
     <appender name="STDOUT"
               class="ch.qos.logback.core.ConsoleAppender">
         <!-- On Windows machines setting withJansi to true enables ANSI color code
@@ -7,7 +7,7 @@
             Mac OS X support ANSI color codes by default. -->
         <withJansi>true</withJansi>
         <encoder>
-            <pattern>[%thread] %highlight(%-5level) %cyan(%logger{15}) - %msg %n
+            <pattern>%date{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %cyan(%logger{15}) - %msg %n
             </pattern>
         </encoder>
     </appender>

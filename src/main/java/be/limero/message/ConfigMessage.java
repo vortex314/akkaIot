@@ -1,4 +1,4 @@
-package be.limero.akka.message;
+package be.limero.message;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

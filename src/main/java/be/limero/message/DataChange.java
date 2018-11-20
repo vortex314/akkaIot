@@ -1,4 +1,4 @@
-package be.limero.akka.message;
+package be.limero.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 
 public class DataChange {
-    private static Logger log = LoggerFactory.getLogger(Message.class);
+    private static Logger log = LoggerFactory.getLogger(MessageJava.class);
 
     public String topic;
     public HashMap<String, Object> map = new HashMap<String, Object>();

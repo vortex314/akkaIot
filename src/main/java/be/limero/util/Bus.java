@@ -2,7 +2,7 @@ package be.limero.util;
 
 import akka.actor.ActorRef;
 import akka.event.japi.ScanningEventBus;
-import be.limero.akka.message.DataChange;
+import be.limero.message.DataChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

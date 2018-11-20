@@ -1,26 +1,26 @@
-package be.limero.akka.message;
+package be.limero.message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-public class Message extends HashMap<String, Object> {
+public class MessageJava extends HashMap<String, Object> {
     private static final long serialVersionUID = 1L;
 //	private final LoggingAdapter log =akka.event.Logging.getLogger(ActorSystem.create("iot-system"),this);
     /**
      *
      */
-    static Logger log = LoggerFactory.getLogger(Message.class);
+    static Logger log = LoggerFactory.getLogger(MessageJava.class);
 
-    public static Message create(String key, String value) {
-        Message msg = new Message();
+    public static MessageJava create(String key, String value) {
+        MessageJava msg = new MessageJava();
         msg.put(key, value);
         return msg;
     }
 
-    public static Message create(Object... objects) {
-        Message msg = new Message();
+    public static MessageJava create(Object... objects) {
+        MessageJava msg = new MessageJava();
         String key = "NOKEY";
         int counter = 0;
         for (Object object : objects) {
@@ -35,8 +35,8 @@ public class Message extends HashMap<String, Object> {
 
     }
 
-    public static Message cmd(String cmd, Object... objects) {
-        Message msg = Message.create("cmd", cmd);
+    public static MessageJava cmd(String cmd, Object... objects) {
+        MessageJava msg = MessageJava.create("cmd", cmd);
         String key = "NOKEY";
         int counter = 0;
         for (Object object : objects) {

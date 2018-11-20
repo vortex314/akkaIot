@@ -5,7 +5,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import be.limero.actor.LocationActor;
-import be.limero.akka.message.DataChange;
+import be.limero.message.DataChange;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

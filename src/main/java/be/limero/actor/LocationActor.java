@@ -4,8 +4,8 @@ import akka.actor.AbstractActor;
 import akka.actor.Props;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
-import be.limero.akka.message.DataChange;
-import be.limero.akka.message.Topic;
+import be.limero.message.DataChange;
+import be.limero.message.Topic;
 import be.limero.util.Bus;
 
 public class LocationActor extends AbstractActor {

@@ -8,8 +8,13 @@ case class KV(key: String, value: Any) {
   }
 }
 
-case class Header(source: String, id: Int, erc: Int) {
+case class Header(source: String, var id: Int, erc: Int) {
   def this(source: String, id: Int) = this(source, id, -1)
+
+  def inc(): Header = {
+    id=id+1;
+    Header(source, id , erc);
+  }
 
   def toArray: Array[Any] = {
     Array(source, id, erc)
@@ -29,7 +34,7 @@ case class Event(source: String, value: Any) {
 
 case class GetRequest(header: Header, properties: String*) {
   def toArray: Array[Any] = {
-    header.toArray ++ properties
+    Array(this.getClass().getSimpleName) ++ header.toArray ++ properties
   }
 }
 
@@ -53,7 +58,7 @@ case class SetReply(header: Header, result: Array[Int]) {
 
 case class ConfigRequest(header: Header, configs: Array[KV]) {
   def toArray: Array[Any] = {
-    header.toArray ++ configs.flatMap(_.toArray)
+    Array(this.getClass().getSimpleName) ++ header.toArray ++ configs.flatMap(_.toArray)
   }
 
   override def toString: String = {

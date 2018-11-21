@@ -26,12 +26,12 @@ public class Starter extends AbstractActor {
         try {
             system = ActorSystem.create("system");
             ActorRef me = system.actorOf(Starter.props(), "Starter");
-            Header.apply("", 1);
-            Reset reset = Reset.apply(Header.apply("dst/system/Starter", 1001));
-            Reset reset2 = new Reset(new Header("dst/system/Starter", 1002));
+            Header header = Header.apply("dst/esp32/system", 1);
+            Reset reset = Reset.apply(header.inc());
+            Reset reset2 = new Reset(header.inc());
             KV[] kvs = {new KV("key1", 1), new KV("key2", 123.5)};
 
-            ConfigRequest config = ConfigRequest.apply(Header.apply("dst", 123), kvs);
+            ConfigRequest config = ConfigRequest.apply(header.inc(), kvs);
 
             me.tell(reset, ActorRef.noSender());
             me.tell(reset2, ActorRef.noSender());
@@ -67,7 +67,7 @@ public class Starter extends AbstractActor {
     }
 
     public void preStart() {
-        context().setReceiveTimeout(Duration.create(3000, TimeUnit.MILLISECONDS));
+        context().setReceiveTimeout(Duration.create(5000, TimeUnit.MILLISECONDS));
     }
 
 

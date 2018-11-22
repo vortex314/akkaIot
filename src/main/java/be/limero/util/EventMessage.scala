@@ -48,7 +48,7 @@ case class StartRequest(var request: Request) {
   }
 }
 
-class GetRequest(dst: String, src: String, props: Array[String]) extends
+case class GetRequest(dst: String, src: String, props: Array[String]) extends
   Request(dst, src, null, Request.staticId, Array()) {
 }
 
@@ -66,6 +66,6 @@ object EventMessage {
     println(Request("AA", "BB"))
     println(StartRequest(Request("dst/xxx", "dst/yyy")))
     println(StartRequest(Request("dst/xxx", "dst/yyy")))
-    println(new GetRequest("DST", "SRC", Array()));
+    println(GetRequest("DST", "SRC", Array()));
   }
 }

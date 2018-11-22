@@ -9,8 +9,5 @@
         <module name="akkaIot" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="akkaIot" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

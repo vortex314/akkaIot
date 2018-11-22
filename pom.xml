@@ -18,6 +18,28 @@
         <commons-lang-version>2.4</commons-lang-version>
 
     </properties>
+    <repositories>
+        <repository>
+            <id>bintray</id>
+            <url>https://jcenter.bintray.com</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>apache</id>
+            <name>Apache Repo</name>
+            <url>http://repo.maven.apache.org</url>
+        </repository>
+        <repository>
+            <id>mvn</id>
+            <name>mvn repo</name>
+            <url>http://mvnrepository.com/artifact</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>

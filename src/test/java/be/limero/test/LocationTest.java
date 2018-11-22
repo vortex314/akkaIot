@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class LocationTest extends AbstractActor {
+public class LocationTest {
     ActorSystem system;
     ActorRef location;
     ActorRef me;
@@ -28,8 +28,8 @@ public class LocationTest extends AbstractActor {
     @Before
     public void setup() {
         system = ActorSystem.create("test-system");
-        location = system.actorOf(LocationActor.props(), "location-actor");
-        me = system.actorOf(LocationTest.props(), "location-tester");
+   /*     location = system.actorOf(LocationActor.props(), "location-actor");
+        me = system.actorOf(LocationTest.props(), "location-tester");*/
     }
 
     @After
@@ -39,15 +39,11 @@ public class LocationTest extends AbstractActor {
 
     @Test
     public void testTrilateration() {
-        location.tell(new DataChange("src/anchor1/dwm1000/distance", "1000"), me);
+    /*    location.tell(new DataChange("src/anchor1/dwm1000/distance", "1000"), me);
         location.tell(new DataChange("src/anchor2/dwm1000/distance", "1000"), me);
-        location.tell(new DataChange("src/anchor3/dwm1000/distance", "1000"), me);
+        location.tell(new DataChange("src/anchor3/dwm1000/distance", "1000"), me);*/
+
     }
 
-    @Override
-    public Receive createReceive() {
-        return receiveBuilder().match(DataChange.class, dc -> dc.isTopic("src/lawnmower/location"), msg -> {
 
-        }).build();
-    }
 }

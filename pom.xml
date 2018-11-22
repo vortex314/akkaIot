@@ -5,6 +5,19 @@
     <groupId>be.limero</groupId>
     <artifactId>akkaIot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>1.8</java.version>
+        <java.home>C:\Program Files\Java\jdk1.8.0_181\</java.home>
+        <maven-compiler-plugin.version>3.7.0</maven-compiler-plugin.version>
+        <maven-shade-plugin.version>3.1.1</maven-shade-plugin.version>
+        <junit-version>4.7</junit-version>
+        <org-slf4j-api-version>1.7.25</org-slf4j-api-version>
+        <commons-lang-version>2.4</commons-lang-version>
+
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -22,6 +35,21 @@
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-actor_2.12</artifactId>
             <version>2.5.13</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-http_2.12</artifactId>
+            <version>10.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-stream_2.12</artifactId>
+            <version>2.5.12</version> <!-- Or whatever the latest version is -->
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-http-jackson_2.12</artifactId>
+            <version>10.1.5</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <dependency>
@@ -54,66 +82,73 @@
             <version>2.9.6</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/io.moquette/moquette-broker -->
+        <dependency>
+            <groupId>io.moquette</groupId>
+            <artifactId>moquette-broker</artifactId>
+            <version>0.11</version>
+        </dependency>
+
+
 
     </dependencies>
 
     <build>
         <finalName>akkaIot</finalName>
         <plugins>
-
-            <!-- download source code in Eclipse, best practice -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <downloadJavadocs>false</downloadJavadocs>
-                </configuration>
-            </plugin>
-
-            <!-- Set a compiler level -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-
-            <!-- Maven Assembly Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4.1</version>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven-shade-plugin.version}</version>
                 <configuration>
-                    <!-- get all project dependencies -->
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <!-- MainClass in mainfest make a executable jar -->
-                    <archive>
-                        <manifest>
-                            <mainClass>be.limero.actor.MqttReceiver</mainClass>
-                        </manifest>
-                    </archive>
-
+                    <transformers>
+                        <!-- Add a transformer to exclude any other manifest files (possibly from dependencies). -->
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                            <resource>MANIFEST.MF</resource>
+                        </transformer>
+                        <!-- Add a transformer to include your custom manifest file. -->
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                            <resource>META-INF/MANIFEST.MF</resource>
+                            <file>src/main/resources/META-INF/MANIFEST.MF</file>
+                        </transformer>
+                        <!-- Add an appendingTransformer to merge all the reference.conf present in each Akka libraries. -->
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                            <resource>reference.conf</resource>
+                        </transformer>
+                    </transformers>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
-                        <!-- bind to the packaging phase -->
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>shade</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
+
     </build>
 
 

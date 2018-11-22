@@ -7,13 +7,20 @@ import akka.actor.Props;
 import akka.event.LoggingAdapter;
 import be.limero.message.DataChange;
 import be.limero.message.MessageJava;
+import be.limero.message.StartRequest;
+import be.limero.message.StopRequest;
 import be.limero.util.Bus;
+import com.typesafe.config.Config;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.util.Random;
 
 public class MqttReceiver extends AbstractActor implements MqttCallback {
+    public class AB {
+    }
+
+    ;
     // AKKA
     static ActorSystem system;
     static ActorRef distanceListener;
@@ -21,40 +28,28 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
     MqttClient _client;
     Bus bus = Bus.getBus();
 
-    String _broker = "tcp://limero.ddns.net:1883";
+    Config _config;
     String _clientId = "client" + new Random().nextInt(100);
     MemoryPersistence _persistence = new MemoryPersistence();
 
-    public MqttReceiver() {
-        log.info(" new MqttReceiver() ");
+    public MqttReceiver(Config config) {
+        _config = config;
+        log.info(" new MqttReceiver('{}') ", config);
     }
 
-    public static void main(String[] args) {
-
-        try {
-            system = ActorSystem.create("iot-system");
-            ActorRef me = system.actorOf(MqttReceiver.props(), "mqtt-receiver");
-            System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tF %1$tT %4$s %2$s %5$s%6$s%n");
-            distanceListener = system.actorOf(LocationActor.props(), "distance-listener");
-            me.tell(MessageJava.cmd("connect"), ActorRef.noSender());
-        } catch (Exception ex) {
-            System.out.println("MQTT failed {}" + ex);
-        }
-    }
-
-    public static Props props() {
-        return Props.create(MqttReceiver.class);
+    public static Props props(Config cfg) {
+        return Props.create(MqttReceiver.class, cfg);
     }
 
     void connect() {
         try {
-            _client = new MqttClient(_broker, _clientId, _persistence);
+            _client = new MqttClient(_config.getString("url"), _clientId, _persistence);
             _client.setCallback(this);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             connOpts.setAutomaticReconnect(true);
             connOpts.setConnectionTimeout(1000);
-            System.out.println("Connecting to broker: " + _broker);
+            System.out.println("Connecting to broker: " + _config.getString("url"));
             _client.connect(connOpts);
             _client.subscribe("src/#");
 
@@ -88,13 +83,11 @@ public class MqttReceiver extends AbstractActor implements MqttCallback {
             bus.publish(new DataChange(topic, payload));
     }
 
-    //
-    // A K K A
-    //
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(MessageJava.class, m -> m.hasKeyValue("cmd", "connect"), m -> connect())
+                .match(StartRequest.class, m -> connect())
+                .match(StopRequest.class, m -> connect())
                 .match(MessageJava.class, m -> m.hasKeyValue("cmd", "disconnect"), m -> disconnect())
                 .match(DataChange.class, m -> {
                     MqttMessage msg = new MqttMessage();

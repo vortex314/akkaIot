@@ -1,7 +1,5 @@
 package be.limero.message
 
-import com.google.gson.JsonArray
-
 case class KV(key: String, value: Any) {
   def toArray: Array[Any] = {
     Array(key, value)
@@ -12,8 +10,8 @@ case class Header(source: String, var id: Int, erc: Int) {
   def this(source: String, id: Int) = this(source, id, -1)
 
   def inc(): Header = {
-    id=id+1;
-    Header(source, id , erc);
+    id = id + 1;
+    Header(source, id, erc);
   }
 
   def toArray: Array[Any] = {
@@ -71,15 +69,41 @@ case class ConfigRequest(header: Header, configs: Array[KV]) {
   }
 }
 
+case class StartRequest(header: Header) {
+  def this() = this(null)
+}
+
+case class StopRequest(header: Header);
+
 case class ConfigReply(header: Header, configErcs: Int*)
 
 case class VarArg(header: Header, arg: String*)
 
 case class Reset(header: Header)
 
+ case class Message(fields: Array[Any]) {
+  def check(): Boolean = {
+    val t = fields(0).getClass()
+    return true
+  }
+
+   override def toString: String = {
+     fields.foreach(println)
+     ""
+   }
+
+}
+
 
 object Message {
+  def create(elements: AnyVal*): Message = {
+    Message(null)
+  }
+
   def main(args: Array[String]): Unit = {
+    println(Message(Array("AA", 1, 2.3, true, 'i')))
+ //   println(Message("123",3,4))
+
     println("Hello from main of class")
     println(VarArg(Header("dst/esp32/system/get", 1), "upTime"))
     val a = Array("a", 1, true, 8.9, 'a');
@@ -94,6 +118,3 @@ object Message {
   }
 }
 
-class Message {
-
-}

@@ -1,31 +1,50 @@
 package be.limero.main;
 
 import akka.actor.*;
-import be.limero.message.ConfigRequest;
-import be.limero.message.Header;
-import be.limero.message.KV;
-import be.limero.message.Reset;
+import be.limero.actor.HttpReceiver;
+import be.limero.actor.MqttBroker;
+import be.limero.actor.MqttReceiver;
+import be.limero.message.*;
 import be.limero.util.Bus;
+import be.limero.util.Cfg;
 import com.google.gson.JsonArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.Array;
 import scala.concurrent.duration.Duration;
 
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class Starter extends AbstractActor {
     // AKKA
     final static Logger log = LoggerFactory.getLogger(Starter.class);
     Bus bus = Bus.getBus();
+    static ActorSystem _system;
+    ActorRef _mqttBroker;
+    ActorRef _mqttReceiver;
+    ActorRef _httpReceiver;
+
+    public void preStart() {
+        context().setReceiveTimeout(Duration.create(5000, TimeUnit.MILLISECONDS));
+
+        _mqttBroker = _system.actorOf(MqttBroker.props(Cfg.toConfig("host=localhost,port=1883,websocket_port=8081,allow_anonymous=true")), "mqttBroker");
+        _mqttReceiver = _system.actorOf(MqttReceiver.props(Cfg.toConfig("url=\"tcp://localhost:1883\"")), "mqttReceiver");
+        _httpReceiver = _system.actorOf(HttpReceiver.props(Cfg.toConfig("host=localhost,port=8082")), "httpReceiver");
+
+
+        KV kvs[] = {new KV("host", "localhost"), new KV("port", 1883)};
+        Object kv[] = {"host", "localhost", "port", 1883};
+        _mqttBroker.tell(ConfigRequest.apply(null, kvs), self());
+        _mqttBroker.tell(new StartRequest(), self());
+
+        _mqttReceiver.tell(new StartRequest(), self());
+    }
 
 
     public static void main(String[] args) {
-        ActorSystem system;
         try {
-            system = ActorSystem.create("system");
-            ActorRef me = system.actorOf(Starter.props(), "Starter");
+            _system = ActorSystem.create("system");
+            ActorRef me = _system.actorOf(Starter.props(), "starter");
+
             Header header = Header.apply("dst/esp32/system", 1);
             Reset reset = Reset.apply(header.inc());
             Reset reset2 = new Reset(header.inc());
@@ -64,10 +83,6 @@ public class Starter extends AbstractActor {
             }
         }
         return json;
-    }
-
-    public void preStart() {
-        context().setReceiveTimeout(Duration.create(5000, TimeUnit.MILLISECONDS));
     }
 
 

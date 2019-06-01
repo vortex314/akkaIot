@@ -18,7 +18,10 @@ import akka.stream.scaladsl.{Broadcast, FileIO, Flow, GraphDSL, Keep, Merge, Run
 import akka.util.{ByteString, CompactByteString}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import akka.stream.scaladsl.GraphDSL.Implicits._
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, JsNumber, JsBoolean, JsString}
+
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
 import scala.collection.immutable
 import scala.concurrent.Future
@@ -66,18 +69,27 @@ object MqttStream {
       )
     val weight = 0.9
 
+    val jsw = JsNumber(weight)
+
     implicit val loggingAdapter = system.log
 
-    def log(prefix: String): Flow[Double, Double, NotUsed] = Flow[Double].map[Double](d => {
-      println(prefix + d);
-      d
+    def log[T](prefix: String): Flow[T, T, NotUsed] = Flow[T].map[T](jsv => {
+      println(prefix + " : " + jsv);
+      jsv
     })
 
     val exponentialFilter: Flow[Double, Double, NotUsed] =
       Flow[Double].scan(0.0)(
         (result, value) => result * (1.0 - weight) + weight * value)
 
-    def scale(x1: Double, x2: Double, y1: Double, y2: Double) = Flow[JsValue].map[Double](d => y1 + (d - x1) * (y2 - y1) / (x2 - x1))
+    def scale(x1: Double, x2: Double, y1: Double, y2: Double) = Flow[Double].map[Double](d => {
+      y1 + (d - x1) * (y2 - y1) / (x2 - x1)
+    })
+
+    def asBoolean() = Flow[JsValue].map[Boolean](js => js.asOpt[Boolean].get)
+
+    def asDouble() = Flow[JsValue].map[Double](js => js.asOpt[Double].get)
+
 
     val toDouble: Flow[MqttMessage, Double, NotUsed] = Flow[MqttMessage].map[Double](msg => msg.payload.utf8String.toDouble)
 
@@ -108,38 +120,38 @@ object MqttStream {
     }
 
 
-    def Src(topic: String) = {
+    def SrcDouble(topic: String) = {
       MqttSource.atMostOnce(
         connectionSettings.withClientId(genClientId("Src-")),
         mqtt.MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
         bufferSize = 8
-      ).via(toJson)
+      ).map[Double](msg => msg.payload.utf8String.toDouble)
+    }
+
+    def SrcBoolean(topic: String) = {
+      MqttSource.atMostOnce(
+        connectionSettings.withClientId(genClientId("Src-")),
+        mqtt.MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
+        bufferSize = 8
+      ).map[Boolean](msg => msg.payload.utf8String.toBoolean)
     }
 
     def Dst(topic: String) = {
-      toMqttMessage("dst/" + topic).to(
+      Flow[Any].map[MqttMessage](d => MqttMessage("dst/" + topic, ByteString(d.toString))).to(
         MqttSink(connectionSettings.withClientId(genClientId("Dst-")), MqttQoS.AtLeastOnce))
     }
-
-
-
-    //    Src("+/controller/potRight").via(scale(0, 1024, -10, 10)).via(exponentialFilter).via(log("SPD ")).to(Dst("drive/motor/speed")).run()
-
-    //    Src("controller/system/alive").to(Dst("drive/system/keepGoing"))
-    //    GridSource("+/controller/potRight") ~> GridSink("")
-    // MQTT src/remote/controller/potLeft= 531 ==> MQTT dst/drive/motor/speed +1.3
 
     RunnableGraph.fromGraph(GraphDSL.create() {
       implicit builder: GraphDSL.Builder[NotUsed] =>
         import akka.stream.scaladsl.GraphDSL.Implicits._
 
-        Src("remote/controller/potLeft") ~> scale(0, 1024, -5, 5) ~> log("speed") ~> Dst("drive/motor/speed")
+        SrcDouble("remote/controller/potLeft") ~> scale(0, 1023, -5, 5)  ~> Dst("drive/motor/targetSpeed")
 
-        //       Src("remote/controller/potLeft") ~> filter( x:Double => x > 0.0 ) ~> Dst("remote/controller/ledLeft")
+        SrcDouble("remote/controller/potRight") ~> scale(0, 1023, -40, +40) ~> Dst("drive/steer/targetAngle")
 
-        //       Src("remote/controller/potRight") ~> scale(0, 1024, -40, +40) ~> exponentialFilter ~> log("direction") ~> Dst("drive/steer/angle")
+        SrcDouble("remote/controller/potLeft").map[Boolean](m => m > 511) ~> Dst("remote/controller/ledLeft")
 
-        //       SrcBoolean("remote/system/alive") ~> DstBoolean("drive/motor/keepGoing")
+        SrcBoolean("remote/system/alive") ~> log[Boolean]("alive") ~> Dst("drive/system/keepGoing")
         ClosedShape
     }).run()
   }

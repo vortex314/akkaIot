@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5962227a-c416-45eb-bc10-eede4a64cef1" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/sbt.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/scala_compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/akkaIot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/akkaIot.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/build.sbt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
@@ -61,8 +61,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="261">
-              <caret line="79" column="103" selection-start-line="79" selection-start-column="103" selection-end-line="79" selection-end-column="103" />
+            <state relative-caret-position="295">
+              <caret line="147" column="72" selection-start-line="147" selection-start-column="72" selection-end-line="147" selection-end-column="72" />
               <folding>
                 <element signature="e#16#47#0" expanded="true" />
               </folding>
@@ -74,7 +74,7 @@
         <entry file="file://$PROJECT_DIR$/build.sbt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="120">
-              <caret line="8" column="34" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
+              <caret line="8" column="67" selection-start-line="8" selection-start-column="67" selection-end-line="8" selection-end-column="67" />
             </state>
           </provider>
         </entry>
@@ -169,9 +169,9 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1511" />
-    <option name="width" value="1695" />
-    <option name="height" value="1416" />
+    <option name="y" value="23" />
+    <option name="width" value="1680" />
+    <option name="height" value="947" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -201,7 +201,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
@@ -240,11 +239,12 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1542922016776" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1559425725357" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit4" value="" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="true" />
@@ -386,10 +386,10 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.Starter" />
-      <item itemvalue="Application.Message (1)" />
       <item itemvalue="Application.EventMessage" />
+      <item itemvalue="Application.Message (1)" />
       <item itemvalue="Application.MqttStream" />
+      <item itemvalue="Application.Starter" />
       <item itemvalue="Maven.akkaIot [compile]" />
     </list>
     <recent_temporary>
@@ -415,7 +415,7 @@
           <value>
             <list>
               <ExternalProjectPojo>
-                <option name="name" value="akkaiot [file:/home/lieven/workspace/akkaIot/]" />
+                <option name="name" value="akkaiot [file:/Users/lieven/workspace/akkaIot/]" />
                 <option name="path" value="$PROJECT_DIR$" />
               </ExternalProjectPojo>
               <ExternalProjectPojo>
@@ -429,8 +429,8 @@
     </option>
     <option name="modificationStamps">
       <map>
-        <entry key="$PROJECT_DIR$/build.sbt" value="93915052" />
-        <entry key="$PROJECT_DIR$/project/build.properties" value="1396028727" />
+        <entry key="$PROJECT_DIR$/build.sbt" value="2004619333" />
+        <entry key="$PROJECT_DIR$/project/build.properties" value="2567920773" />
       </map>
     </option>
   </component>
@@ -456,7 +456,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1439" y="-1" width="3442" height="1421" extended-state="6" />
+    <frame x="0" y="23" width="1680" height="947" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
@@ -465,22 +465,22 @@
       <window_info id="Capture Tool" order="3" />
       <window_info id="Favorites" order="4" side_tool="true" />
       <window_info id="Image Layers" order="5" />
-      <window_info content_ui="combo" id="Project" order="6" visible="true" weight="0.13641721" />
+      <window_info content_ui="combo" id="Project" order="6" visible="true" weight="0.14119804" />
       <window_info id="Structure" order="7" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="sbt-shell-toolwindow" />
       <window_info anchor="bottom" id="Terminal" order="0" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="2" weight="0.32924962" />
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" weight="0.32924962" />
       <window_info anchor="bottom" id="Run" order="5" weight="0.33488733" />
-      <window_info anchor="bottom" id="Debug" order="6" weight="0.3993784" />
+      <window_info active="true" anchor="bottom" id="Debug" order="6" visible="true" weight="0.3988304" />
       <window_info anchor="bottom" id="Cvs" order="7" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="8" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="9" />
-      <window_info active="true" anchor="bottom" id="Messages" order="10" visible="true" weight="0.32739937" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.3263158" />
       <window_info anchor="bottom" id="Inspection Results" order="11" weight="0.32924962" />
-      <window_info anchor="bottom" id="Build" order="12" weight="0.32817337" />
+      <window_info anchor="bottom" id="Build" order="12" weight="0.32748538" />
+      <window_info anchor="bottom" id="sbt-shell-toolwindow" order="13" weight="0.32982457" />
       <window_info anchor="right" id="Capture Analysis" order="0" />
       <window_info anchor="right" id="Palette&#9;" order="1" />
       <window_info anchor="right" id="Theme Preview" order="2" />
@@ -490,7 +490,8 @@
       <window_info anchor="right" id="Ant Build" order="6" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="7" weight="0.25" />
       <window_info anchor="right" id="Maven" order="8" />
-      <window_info anchor="right" id="sbt" order="9" weight="0.32969034" />
+      <window_info anchor="right" id="sbt" order="9" weight="0.3294621" />
+      <window_info anchor="right" id="ASM" order="10" />
     </layout>
     <layout-to-restore>
       <window_info id="Image Layers" order="0" />
@@ -549,13 +550,7 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/Main2.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/actor/IotSlave.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/actor/IotSupervisor.java" />
-    <entry file="jar:///usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/rt.jar!/java/lang/Long.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="246" selection-start-line="246" selection-end-line="246" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="jar:///usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/lib/rt.jar!/java/lang/Long.class" />
     <entry file="file://$PROJECT_DIR$/src/test/java/be/limero/actor/BaseActorTest.java" />
     <entry file="file://$PROJECT_DIR$/src/test/java/be/limero/test/LocationTest.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/message/DataChange.java" />
@@ -582,20 +577,20 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/message/Message.scala" />
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/main/Starter.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/util/EventMessage.scala" />
-    <entry file="file://$PROJECT_DIR$/build.sbt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="34" selection-start-line="8" selection-start-column="34" selection-end-line="8" selection-end-column="34" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="261">
-          <caret line="79" column="103" selection-start-line="79" selection-start-column="103" selection-end-line="79" selection-end-column="103" />
+        <state relative-caret-position="295">
+          <caret line="147" column="72" selection-start-line="147" selection-start-column="72" selection-end-line="147" selection-end-column="72" />
           <folding>
             <element signature="e#16#47#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/build.sbt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="67" selection-start-line="8" selection-start-column="67" selection-end-line="8" selection-end-column="67" />
         </state>
       </provider>
     </entry>

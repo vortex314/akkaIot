@@ -18,6 +18,7 @@ import akka.stream.scaladsl.{Broadcast, FileIO, Flow, GraphDSL, Keep, Merge, Run
 import akka.util.{ByteString, CompactByteString}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import akka.stream.scaladsl.GraphDSL.Implicits._
+import play.api.libs.json.{JsValue, Json}
 
 import scala.collection.immutable
 import scala.concurrent.Future
@@ -76,12 +77,16 @@ object MqttStream {
       Flow[Double].scan(0.0)(
         (result, value) => result * (1.0 - weight) + weight * value)
 
-    def scale(x1: Double, x2: Double, y1: Double, y2: Double) = Flow[Double].map[Double](d => y1 + (d - x1) * (y2 - y1) / (x2 - x1))
+    def scale(x1: Double, x2: Double, y1: Double, y2: Double) = Flow[JsValue].map[Double](d => y1 + (d - x1) * (y2 - y1) / (x2 - x1))
 
     val toDouble: Flow[MqttMessage, Double, NotUsed] = Flow[MqttMessage].map[Double](msg => msg.payload.utf8String.toDouble)
 
+    val toJson: Flow[MqttMessage, JsValue, NotUsed] = Flow[MqttMessage].map[JsValue](msg => Json.parse(msg.payload.utf8String))
+
+
     def toMqttMessage(topic: String): Flow[Double, MqttMessage, NotUsed] =
       Flow[Double].map[MqttMessage](d => MqttMessage(topic, ByteString(d.toString)))
+
 
     val mqttFlow: Flow[MqttMessage, MqttMessage, Future[Done]] =
       MqttFlow.atMostOnce(
@@ -96,29 +101,31 @@ object MqttStream {
 
     var counter = 0
 
-    def genClientId() = {
+    def genClientId(prefix: String) = {
       counter += 1
-      "GridSource-" + counter
+      println(" new id " + counter)
+      prefix + counter
     }
 
 
     def Src(topic: String) = {
       MqttSource.atMostOnce(
-        connectionSettings.withClientId(genClientId()),
+        connectionSettings.withClientId(genClientId("Src-")),
         mqtt.MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
         bufferSize = 8
-      ).via(toDouble)
+      ).via(toJson)
     }
 
     def Dst(topic: String) = {
-      toMqttMessage(topic).to(
-        MqttSink(connectionSettings, MqttQoS.AtLeastOnce))
+      toMqttMessage("dst/" + topic).to(
+        MqttSink(connectionSettings.withClientId(genClientId("Dst-")), MqttQoS.AtLeastOnce))
     }
 
 
-    Src("+/controller/potRight").via(scale(0, 1024, -10, 10)).via(exponentialFilter).via(log("SPD ")).to(Dst("drive/motor/speed")).run()
 
-    Src("controller/system/alive").to(Dst("drive/system/keepGoing"))
+    //    Src("+/controller/potRight").via(scale(0, 1024, -10, 10)).via(exponentialFilter).via(log("SPD ")).to(Dst("drive/motor/speed")).run()
+
+    //    Src("controller/system/alive").to(Dst("drive/system/keepGoing"))
     //    GridSource("+/controller/potRight") ~> GridSink("")
     // MQTT src/remote/controller/potLeft= 531 ==> MQTT dst/drive/motor/speed +1.3
 
@@ -126,11 +133,13 @@ object MqttStream {
       implicit builder: GraphDSL.Builder[NotUsed] =>
         import akka.stream.scaladsl.GraphDSL.Implicits._
 
-        Src("+/controller/potLeft") ~> scale(0, 1024, -5, 5) ~> log("speed") ~> Dst("drive/motor/speed")
+        Src("remote/controller/potLeft") ~> scale(0, 1024, -5, 5) ~> log("speed") ~> Dst("drive/motor/speed")
 
-        Src("+/controller/potRight") ~> scale(0, 1024, -40, +40) ~> exponentialFilter ~> log("direction") ~> Dst("drive/steer/angle")
+        //       Src("remote/controller/potLeft") ~> filter( x:Double => x > 0.0 ) ~> Dst("remote/controller/ledLeft")
 
-        Src("+/controller/alive") ~> Dst("")
+        //       Src("remote/controller/potRight") ~> scale(0, 1024, -40, +40) ~> exponentialFilter ~> log("direction") ~> Dst("drive/steer/angle")
+
+        //       SrcBoolean("remote/system/alive") ~> DstBoolean("drive/motor/keepGoing")
         ClosedShape
     }).run()
   }

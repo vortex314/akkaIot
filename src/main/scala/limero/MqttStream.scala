@@ -61,15 +61,7 @@ object MqttStream {
     val connectionSettings = MqttConnectionSettings("tcp://limero.ddns.net:1883", "", new MemoryPersistence)
       .withAutomaticReconnect(true)
 
-    val mqttSource: Source[MqttMessage, Future[Done]] =
-      MqttSource.atMostOnce(
-        connectionSettings.withClientId(clientId = "source-spec/source"),
-        mqtt.MqttSubscriptions(Map("src/#" -> MqttQoS.atMostOnce, "dst/#" -> MqttQoS.AtLeastOnce)),
-        bufferSize = 8
-      )
     val weight = 0.9
-
-    val jsw = JsNumber(weight)
 
     implicit val loggingAdapter = system.log
 
@@ -83,33 +75,9 @@ object MqttStream {
         (result, value) => result * (1.0 - weight) + weight * value)
 
     def scale(x1: Double, x2: Double, y1: Double, y2: Double) = Flow[Double].map[Double](d => {
-      y1 + (d - x1) * (y2 - y1) / (x2 - x1)
+      val r = y1 + (d - x1) * (y2 - y1) / (x2 - x1)
+      (math floor r * 100) / 100
     })
-
-    def asBoolean() = Flow[JsValue].map[Boolean](js => js.asOpt[Boolean].get)
-
-    def asDouble() = Flow[JsValue].map[Double](js => js.asOpt[Double].get)
-
-
-    val toDouble: Flow[MqttMessage, Double, NotUsed] = Flow[MqttMessage].map[Double](msg => msg.payload.utf8String.toDouble)
-
-    val toJson: Flow[MqttMessage, JsValue, NotUsed] = Flow[MqttMessage].map[JsValue](msg => Json.parse(msg.payload.utf8String))
-
-
-    def toMqttMessage(topic: String): Flow[Double, MqttMessage, NotUsed] =
-      Flow[Double].map[MqttMessage](d => MqttMessage(topic, ByteString(d.toString)))
-
-
-    val mqttFlow: Flow[MqttMessage, MqttMessage, Future[Done]] =
-      MqttFlow.atMostOnce(
-        connectionSettings.withClientId("flow-spec/flow"),
-        MqttSubscriptions("src/#", MqttQoS.AtLeastOnce),
-        bufferSize = 8,
-        MqttQoS.AtLeastOnce
-      )
-
-    val sink: Sink[MqttMessage, Future[Done]] =
-      MqttSink(connectionSettings, MqttQoS.AtLeastOnce)
 
     var counter = 0
 
@@ -151,33 +119,17 @@ object MqttStream {
 
         SrcDouble("remote/controller/potLeft").map[Boolean](m => m > 511) ~> Dst("remote/controller/ledLeft")
 
+        SrcDouble("remote/controller/potRight").map[Boolean](m => m > 511) ~> Dst("remote/controller/ledRight")
+
+        SrcBoolean("remote/controller/buttonLeft") ~> Dst("remote/controller/ledRight")
+
+        SrcBoolean("remote/controller/buttonRight") ~> Dst("remote/controller/ledLeft")
+
         SrcBoolean("remote/system/alive") ~> log[Boolean]("alive") ~> Dst("drive/system/keepGoing")
         ClosedShape
     }).run()
   }
 }
-
-/*
-
-class Streams {
-  var old: Double = 0
-
-  def exponentialFilter(f: Double): Double = {
-    val weight = 0.1
-    old = (1 - weight) * f + weight * old
-    old
-  }
-
-  def trilateration(anchorDistance: AnchorDistance): Coordinate = {
-    Coordinate(1.3, 4.8)
-  }
-
-  GridSource[Double]("navigator/compass").via(exponentialFilter(_)).to(MqttSink[Coordinate]("navigator/direction")).mat()
-  MqttSource[AnchorDistance]("navigator/location").via(trilateration(_)).to(MqttSink[Coordinate]("lawnmower/location"))
-  MqttSource[HeartBeat]("brain/working").to(MqttSinks[HeartBeat]("motor/continue", "steer/continue"))
-  MqttSource[Double]("+/anchor/x", "+/anchor/y", "+/anchor/distance")
-}
-*/
 
 class MqttStream {
 

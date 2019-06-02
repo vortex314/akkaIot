@@ -48,7 +48,6 @@ class LimeroSource(device: String, actor: String, msgType: String)
 object MqttStream {
   def main(args: Array[String]): Unit = {
     implicit val system = ActorSystem()
-    //    implicit val mat = ActorMaterializer()
 
     val decider: Supervision.Decider = {
       case _: Exception => Supervision.Resume
@@ -113,6 +112,8 @@ object MqttStream {
       implicit builder: GraphDSL.Builder[NotUsed] =>
         import akka.stream.scaladsl.GraphDSL.Implicits._
 
+        val merge = builder.add(Merge[Double](3))
+
         SrcDouble("remote/controller/potLeft") ~> scale(0, 1023, -5, 5)  ~> Dst("drive/motor/targetSpeed")
 
         SrcDouble("remote/controller/potRight") ~> scale(0, 1023, -40, +40) ~> Dst("drive/steer/targetAngle")
@@ -126,6 +127,11 @@ object MqttStream {
         SrcBoolean("remote/controller/buttonRight") ~> Dst("remote/controller/ledLeft")
 
         SrcBoolean("remote/system/alive") ~> log[Boolean]("alive") ~> Dst("drive/system/keepGoing")
+
+        SrcDouble("+/anchor/distance") ~> merge ~> Dst("lawnmower/navigation/location")
+        SrcDouble("+/anchor/x") ~> merge
+        SrcDouble("+/anchor/y") ~> merge
+
         ClosedShape
     }).run()
   }

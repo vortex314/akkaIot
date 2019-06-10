@@ -73,9 +73,9 @@ object MqttStream {
       Flow[Double].scan(0.0)(
         (result, value) => result * (1.0 - weight) + weight * value)
 
-    def scale(x1: Double, x2: Double, y1: Double, y2: Double) = Flow[Double].map[Double](d => {
+    def scale(x1: Double, x2: Double, y1: Double, y2: Double, step: Double) = Flow[Double].map[Double](d => {
       val r = y1 + (d - x1) * (y2 - y1) / (x2 - x1)
-      (math floor r * 100) / 100
+      Math.round((r + step / 2) / step) * step
     })
 
     var counter = 0
@@ -114,19 +114,16 @@ object MqttStream {
 
         val merge = builder.add(Merge[Double](3))
 
-        SrcDouble("remote/controller/potLeft") ~> scale(0, 1023, -5, 5)  ~> Dst("drive/motor/targetSpeed")
+        SrcDouble("remote/controller/potLeft") ~> scale(0, 1023, -5, 5, 0.1) ~> Dst("drive/motor/targetSpeed")
 
-        SrcDouble("remote/controller/potRight") ~> scale(0, 1023, -40, +40) ~> Dst("drive/steer/targetAngle")
+        SrcDouble("remote/controller/potRight") ~> scale(0, 1023, -40, +40, 1) ~> Dst("drive/steer/targetAngle")
 
-        SrcDouble("remote/controller/potLeft").map[Boolean](m => m > 511) ~> Dst("remote/controller/ledLeft")
 
-        SrcDouble("remote/controller/potRight").map[Boolean](m => m > 511) ~> Dst("remote/controller/ledRight")
-
-        SrcBoolean("remote/controller/buttonLeft") ~> Dst("remote/controller/ledRight")
+        // SrcBoolean("remote/controller/buttonLeft") ~> Dst("pi2/wiring/gpio",JsObject("pin"->6,"mode"->"out","write"->bool?1:0))
 
         SrcBoolean("remote/controller/buttonRight") ~> Dst("remote/controller/ledLeft")
 
-        SrcBoolean("remote/system/alive") ~> log[Boolean]("alive") ~> Dst("drive/system/keepGoing")
+        SrcBoolean("remote/system/alive") ~> log[Boolean]("alive") ~> Dst("drive/motor/keepGoing")
 
         SrcDouble("+/anchor/distance") ~> merge ~> Dst("lawnmower/navigation/location")
         SrcDouble("+/anchor/x") ~> merge

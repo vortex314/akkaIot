@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5962227a-c416-45eb-bc10-eede4a64cef1" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/akkaIot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/akkaIot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" afterDir="false" />
+    <list default="true" id="5962227a-c416-45eb-bc10-eede4a64cef1" name="Default" comment="trilateration next, now first motordrive">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala" afterDir="false" />
     </list>
@@ -60,8 +58,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="77" column="14" selection-start-line="77" selection-start-column="14" selection-end-line="77" selection-end-column="14" />
+            <state relative-caret-position="616">
+              <caret line="127" column="87" lean-forward="true" selection-start-line="127" selection-start-column="87" selection-end-line="127" selection-end-column="87" />
               <folding>
                 <element signature="e#16#47#0" expanded="true" />
               </folding>
@@ -168,8 +166,8 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1511" />
-    <option name="width" value="1695" />
+    <option name="x" value="1440" />
+    <option name="width" value="1685" />
     <option name="height" value="1416" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -242,8 +240,8 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -456,11 +454,27 @@
       <option name="project" value="LOCAL" />
       <updated>1531083590007</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="trilateration next, now first motordrive">
+      <created>1559509981688</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1559509981688</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="1511" y="0" width="1695" height="1416" extended-state="0" />
+    <frame x="1440" y="0" width="1685" height="1416" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
@@ -469,19 +483,19 @@
       <window_info id="Capture Tool" order="3" />
       <window_info id="Favorites" order="4" side_tool="true" />
       <window_info id="Image Layers" order="5" />
-      <window_info content_ui="combo" id="Project" order="6" visible="true" weight="0.2962963" />
+      <window_info content_ui="combo" id="Project" order="6" visible="true" weight="0.29993892" />
       <window_info id="Structure" order="7" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="0" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="2" weight="0.32924962" />
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" weight="0.32924962" />
-      <window_info anchor="bottom" id="Run" order="5" weight="0.33488733" />
-      <window_info active="true" anchor="bottom" id="Debug" order="6" visible="true" weight="0.3986014" />
+      <window_info active="true" anchor="bottom" id="Run" order="5" visible="true" weight="0.33488733" />
+      <window_info anchor="bottom" id="Debug" order="6" weight="0.3970588" />
       <window_info anchor="bottom" id="Cvs" order="7" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="8" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="9" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.3263158" />
+      <window_info anchor="bottom" id="TODO" order="9" weight="0.32944834" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.32585138" />
       <window_info anchor="bottom" id="Inspection Results" order="11" weight="0.32924962" />
       <window_info anchor="bottom" id="Build" order="12" weight="0.32711732" />
       <window_info anchor="bottom" id="sbt-shell-toolwindow" order="13" weight="0.32944834" />
@@ -494,7 +508,7 @@
       <window_info anchor="right" id="Ant Build" order="6" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="7" weight="0.25" />
       <window_info anchor="right" id="Maven" order="8" />
-      <window_info anchor="right" id="sbt" order="9" weight="0.3294621" />
+      <window_info anchor="right" id="sbt" order="9" weight="0.33068943" />
       <window_info anchor="right" id="ASM" order="10" />
     </layout>
     <layout-to-restore>
@@ -530,7 +544,8 @@
     <MESSAGE value="working with intelliJ" />
     <MESSAGE value="working with intelliJ - cleanup" />
     <MESSAGE value="seeking for BaseActor and BaseMessage" />
-    <option name="LAST_COMMIT_MESSAGE" value="seeking for BaseActor and BaseMessage" />
+    <MESSAGE value="trilateration next, now first motordrive" />
+    <option name="LAST_COMMIT_MESSAGE" value="trilateration next, now first motordrive" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -590,8 +605,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="77" column="14" selection-start-line="77" selection-start-column="14" selection-end-line="77" selection-end-column="14" />
+        <state relative-caret-position="616">
+          <caret line="127" column="87" lean-forward="true" selection-start-line="127" selection-start-column="87" selection-end-line="127" selection-end-column="87" />
           <folding>
             <element signature="e#16#47#0" expanded="true" />
           </folding>

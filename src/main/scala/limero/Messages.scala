@@ -1,3 +1,5 @@
+package limero
+
 import java.util.Date
 
 import play.api.libs.json._

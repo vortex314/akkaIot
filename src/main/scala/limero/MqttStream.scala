@@ -1,4 +1,4 @@
-package be.limero
+package limero
 
 import java.util.Date
 import java.util.concurrent.TimeUnit
@@ -14,7 +14,8 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import play.api.libs.json._
 import play.api.libs.json.{JsNull, JsString, JsValue, Json}
 import play.api.libs.functional.syntax._
-import Messages._
+//import limero.Messages._
+import limero._
 import akka.pattern.ask
 
 
@@ -27,10 +28,10 @@ object MqttStream {
       case _: Exception => Supervision.Resume
       case _ => Supervision.Stop
     }
+    implicit val system = ActorSystem()
 
     implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system)
       .withSupervisionStrategy(decider))
-    implicit val system = ActorSystem()
     implicit val loggingAdapter = system.log
     implicit val askTimeout = Timeout(5, TimeUnit.SECONDS)
 
@@ -48,8 +49,10 @@ object MqttStream {
       implicit builder: GraphDSL.Builder[NotUsed] =>
         import GraphDSL.Implicits._
 
-        ms.Src("remote/controller/potLeft").map(jsv => (jsv \ "value").as[Double]) ~> ms.scale(0, 1023, -5, 5, 0.1) ~> threshold(0.1) ~> ms.Dst("drive/motor/targetSpeed")
+        ms.Src("remote/controller/potLeft").map(jsv => (jsv \ "value").as[Double]) ~> ms.scale(0, 1023, -5, 5, 0.1) ~> ms.threshold(0.1) ~> ms.Dst("drive/motor/targetSpeed")
         ms.Src("remote/controller/potRight").map(jsv => (jsv \ "value").as[Double]) ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.Dst("drive/steer/targetAngle")
+        ms.SrcBoolean("remote/system/alive") ~> ms.log[Boolean]("alive") ~> ms.Dst("drive/motor/keepGoing")
+
         /*
                 SrcDouble("remote/controller/potLeft") ~> scale(0, 1023, -5, 5, 0.1) ~> Dst("drive/motor/targetSpeed")
 

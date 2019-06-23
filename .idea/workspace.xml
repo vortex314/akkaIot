@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5962227a-c416-45eb-bc10-eede4a64cef1" name="Default" comment="trilateration next, now first motordrive">
-      <change afterPath="$PROJECT_DIR$/src/main/scala/limero/Messages.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/limero/Trilateration.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/limero/Messages.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/limero/Messages.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/limero/Trilateration.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/limero/Trilateration.scala" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/target/" />
     <ignored path="$PROJECT_DIR$/project/project/target/" />
@@ -60,8 +60,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2195">
-              <caret line="179" column="3" selection-start-line="179" selection-start-column="3" selection-end-line="179" selection-end-column="3" />
+            <state relative-caret-position="396">
+              <caret line="59" lean-forward="true" selection-start-line="59" selection-end-line="59" />
               <folding>
                 <element signature="e#19#40#0" expanded="true" />
               </folding>
@@ -72,8 +72,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/limero/Trilateration.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
+            <state>
+              <caret column="8" selection-start-column="8" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -81,10 +81,18 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/scala/limero/Messages.scala">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" selection-start-line="2" selection-end-line="4" selection-end-column="40" />
+            <state>
+              <caret column="8" selection-start-column="8" selection-end-column="8" />
+              <folding>
+                <element signature="e#0#21#0" expanded="true" />
+              </folding>
             </state>
           </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/project/build.properties">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -150,6 +158,7 @@
         <option value="$PROJECT_DIR$/src/main/java/be/limero/util/EventMessage.scala" />
         <option value="$PROJECT_DIR$/build.sbt" />
         <option value="$PROJECT_DIR$/src/main/scala/limero/Messages.scala" />
+        <option value="$PROJECT_DIR$/src/main/scala/limero/Trilateration.scala" />
         <option value="$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala" />
       </list>
     </option>
@@ -231,6 +240,12 @@
               <item name="MqttStreams" type="b2602c69:ProjectViewProjectNode" />
               <item name="akkaIot" type="462c0819:PsiDirectoryNode" />
               <item name="project" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="MqttStreams" type="b2602c69:ProjectViewProjectNode" />
+              <item name="akkaIot" type="462c0819:PsiDirectoryNode" />
+              <item name="project" type="462c0819:PsiDirectoryNode" />
+              <item name="target" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="MqttStreams" type="b2602c69:ProjectViewProjectNode" />
@@ -483,7 +498,21 @@
       <option name="project" value="LOCAL" />
       <updated>1559509981688</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="trilateration next, now first motordrive">
+      <created>1561283467585</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1561283467585</updated>
+    </task>
+    <task id="LOCAL-00004" summary="trilateration next, now first motordrive">
+      <created>1561283488000</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1561283488000</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView">
@@ -497,6 +526,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1440" y="0" width="2068" height="1416" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
@@ -504,19 +534,19 @@
       <window_info id="Capture Tool" order="3" />
       <window_info id="Favorites" order="4" side_tool="true" />
       <window_info id="Image Layers" order="5" />
-      <window_info active="true" content_ui="combo" id="Project" order="6" visible="true" weight="0.2460396" />
+      <window_info content_ui="combo" id="Project" order="6" visible="true" weight="0.2460396" />
       <window_info id="Structure" order="7" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="0" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
-      <window_info anchor="bottom" id="Version Control" order="2" weight="0.32924962" />
+      <window_info anchor="bottom" id="Version Control" order="2" weight="0.32867134" />
       <window_info anchor="bottom" id="Message" order="3" />
       <window_info anchor="bottom" id="Find" order="4" weight="0.32924962" />
-      <window_info anchor="bottom" id="Run" order="5" weight="0.33488733" />
-      <window_info anchor="bottom" id="Debug" order="6" weight="0.3970588" />
+      <window_info active="true" anchor="bottom" id="Run" order="5" visible="true" weight="0.33488733" />
+      <window_info anchor="bottom" id="Debug" order="6" weight="0.3970474" />
       <window_info anchor="bottom" id="Cvs" order="7" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="8" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="9" weight="0.32944834" />
-      <window_info anchor="bottom" id="Messages" order="10" visible="true" weight="0.32478634" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.32478634" />
       <window_info anchor="bottom" id="Inspection Results" order="11" weight="0.32924962" />
       <window_info anchor="bottom" id="Build" order="12" weight="0.32711732" />
       <window_info anchor="bottom" id="sbt-shell-toolwindow" order="13" weight="0.32944834" />
@@ -529,7 +559,7 @@
       <window_info anchor="right" id="Ant Build" order="6" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="7" weight="0.25" />
       <window_info anchor="right" id="Maven" order="8" />
-      <window_info anchor="right" id="sbt" order="9" weight="0.3304826" />
+      <window_info anchor="right" id="sbt" order="9" weight="0.33019802" />
       <window_info anchor="right" id="ASM" order="10" />
     </layout>
     <layout-to-restore>
@@ -617,6 +647,9 @@
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/message/Message.scala" />
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/main/Starter.java" />
     <entry file="file://$PROJECT_DIR$/src/main/java/be/limero/util/EventMessage.scala" />
+    <entry file="file://$PROJECT_DIR$/project/build.properties">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/build.sbt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -624,24 +657,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/limero/Trilateration.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/limero/Messages.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
+        <state>
+          <caret column="8" selection-start-column="8" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/scala/limero/Messages.scala">
+    <entry file="file://$PROJECT_DIR$/src/main/scala/limero/Trilateration.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" selection-start-line="2" selection-end-line="4" selection-end-column="40" />
+        <state>
+          <caret column="8" selection-start-column="8" selection-end-column="8" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/scala/limero/MqttStream.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2195">
-          <caret line="179" column="3" selection-start-line="179" selection-start-column="3" selection-end-line="179" selection-end-column="3" />
+        <state relative-caret-position="396">
+          <caret line="59" lean-forward="true" selection-start-line="59" selection-end-line="59" />
           <folding>
             <element signature="e#19#40#0" expanded="true" />
           </folding>

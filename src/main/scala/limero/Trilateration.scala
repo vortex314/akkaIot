@@ -1,4 +1,4 @@
-package be.limero
+package limero
 
 import akka.actor.Actor
 import akka.event.Logging

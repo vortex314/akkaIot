@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/akkaIot.iml" filepath="$PROJECT_DIR$/.idea/akkaIot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MqttStreams.iml" filepath="$PROJECT_DIR$/.idea/modules/MqttStreams.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" filepath="$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" />
     </modules>
   </component>
 </project>

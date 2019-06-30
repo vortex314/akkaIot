@@ -1,19 +1,19 @@
 package limero
 
+import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.concurrent.TimeUnit
+
 import akka.NotUsed
 import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.stream.alpakka.mqtt.scaladsl.MqttSource._
-import akka.stream.alpakka.mqtt.{MqttConnectionSettings, MqttMessage, MqttQoS, MqttSubscriptions}
 import akka.stream.alpakka.mqtt.scaladsl.{MqttSink, MqttSource}
-import akka.stream.scaladsl.{Flow, GraphDSL, Merge, RunnableGraph}
+import akka.stream.alpakka.mqtt.{MqttConnectionSettings, MqttMessage, MqttQoS, MqttSubscriptions}
+import akka.stream.scaladsl.{Flow, GraphDSL, RunnableGraph}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, ClosedShape, Supervision}
 import akka.util.{ByteString, Timeout}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
-import play.api.libs.json._
-import play.api.libs.json.{JsNull, JsString, JsValue, Json}
-import play.api.libs.functional.syntax._
+import org.slf4j.LoggerFactory
+import play.api.libs.json.{JsValue, Json}
 //import limero.Messages._
 import limero._
 import akka.pattern.ask
@@ -38,9 +38,9 @@ object MqttStream {
 
     val ms = new MqttStream("tcp://limero.ddns.net:1883");
 
-    val jsv: JsValue = Json.parse("""{"x":10,"y":100,"id":1234,"distance":1.234,"location":{"x":10,"y":101}}""")
+    /*    val jsv: JsValue = Json.parse("""{"x":10,"y":100,"id":1234,"distance":1.234,"location":{"x":10,"y":101}}""")
 
-    val anchor = jsv.as[AnchorDistance]
+        val anchor = jsv.as[AnchorDistance]*/
 
     val tril: ActorRef = system.actorOf(Props[Trilateration], "trilateration")
 
@@ -50,43 +50,15 @@ object MqttStream {
         import GraphDSL.Implicits._
 
         ms.Src("remote/controller/potLeft").map(jsv => (jsv \ "value").as[Double]) ~> ms.scale(0, 1023, -5, 5, 0.1) ~> ms.threshold(0.1) ~> ms.Dst("drive/motor/targetSpeed")
-        ms.Src("remote/controller/potRight").map(jsv => (jsv \ "value").as[Double]) ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.Dst("drive/steer/targetAngle")
+        ms.Src("remote/controller/potRight").map(jsv => (jsv \ "value").as[Double])~> ms.log[Double]("potRight") ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.Dst("drive/steer/targetAngle")
         ms.SrcBoolean("remote/system/alive") ~> ms.log[Boolean]("alive") ~> ms.Dst("drive/motor/keepGoing")
-
-        /*
-                SrcDouble("remote/controller/potLeft") ~> scale(0, 1023, -5, 5, 0.1) ~> Dst("drive/motor/targetSpeed")
-
-                SrcDouble("remote/controller/potRight") ~> scale(0, 1023, -40, +40, 1) ~> Dst("drive/steer/targetAngle")
-
-
-        // SrcBoolean("remote/controller/buttonLeft") ~> Dst("pi2/wiring/gpio",JsObject("pin"->6,"mode"->"out","write"->bool?1:0))
-
-        SrcDouble("remote/controller/potRight").map(m => m > 511) ~> Dst("remote/controller/ledRight")
-
-        Src("tag/dwm1000/anchor").map(jsv => jsv.
-          as[AnchorDistance]).map(anchorDistance => (tril ? anchorDistance).
-          mapTo[Option[Coordinate]]).
-          filter(opt => opt.isCompleted) ~> Dst("lawnmower/location/coordinate")
-
-        Src("remote/controller/buttonLeft").map(_.as[Boolean]) ~> Dst("pi2/wiring/gpio6")
-
-        Src("pi2/wiring/gpio6") ~> Dst("remote/controller/ledLeft")
-
-        Src("remote/system/alive").map(_.as[Boolean]) ~> log[Boolean]("alive") ~> Dst("drive/system/keepGoing")
-
-        Src("+/system/+").map(jsv => (jsv \ "value").as[Double]) ~> log[Double]("addOne") ~> Dst("brain/addOne")
-
-        SrcBoolean("remote/system/alive") ~> log[Boolean]("alive") ~> Dst("drive/motor/keepGoing")
-        Src("+/system/alive").filter(jsv => (jsv \ "topic").as[String].contains("remote"))
-
-        //        Src("+/system/alive")~> replace[Boolean]("boolean",x => !(x))~>Dst("brain/system/dead")*/
-
         ClosedShape
     }).run()
   }
 }
 
 class MqttStream(url: String) {
+  val log = LoggerFactory.getLogger(classOf[Trilateration])
 
 
   val connectionSettings = MqttConnectionSettings("tcp://limero.ddns.net:1883", "", new MemoryPersistence)
@@ -95,7 +67,7 @@ class MqttStream(url: String) {
   var counter = 0
 
   def SrcDouble(topic: String) = {
-    atMostOnce(
+    MqttSource.atMostOnce(
       connectionSettings.withClientId(genClientId("Src-")),
       MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
       bufferSize = 8
@@ -103,14 +75,14 @@ class MqttStream(url: String) {
   }
 
   def SrcBoolean(topic: String) = {
-    atMostOnce(
+    MqttSource.atMostOnce(
       connectionSettings.withClientId(genClientId("Src-")),
       MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
       bufferSize = 8
     ).map[Boolean](msg => msg.payload.utf8String.toBoolean)
   }
 
-  def Src(topic: String, prefix: String = "src/") = atMostOnce(
+  def Src(topic: String, prefix: String = "src/") = MqttSource.atMostOnce(
     connectionSettings.withClientId(genClientId("Src-")),
     MqttSubscriptions(Map(prefix + topic -> MqttQoS.atMostOnce)),
     bufferSize = 8
@@ -133,7 +105,6 @@ class MqttStream(url: String) {
 
   def genClientId(prefix: String) = {
     counter += 1
-    println(" new id " + counter)
     prefix + counter
   }
 
@@ -148,7 +119,8 @@ class MqttStream(url: String) {
 
 
   def log[T](prefix: String): Flow[T, T, NotUsed] = Flow[T].map[T](jsv => {
-    println(prefix + " : " + jsv);
+
+    log.info( prefix + " : " + jsv);
     jsv
   })
 

@@ -8,20 +8,18 @@ import akka.NotUsed
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.stream.alpakka.mqtt.scaladsl.{MqttSink, MqttSource}
 import akka.stream.alpakka.mqtt.{MqttConnectionSettings, MqttMessage, MqttQoS, MqttSubscriptions}
-import akka.stream.scaladsl.{Flow, GraphDSL, RunnableGraph}
+import akka.stream.scaladsl.{Flow, GraphDSL, Keep, Merge, RunnableGraph}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, ClosedShape, Supervision}
 import akka.util.{ByteString, Timeout}
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 import org.slf4j.LoggerFactory
-import play.api.libs.json.{JsValue, Json}
-//import limero.Messages._
+import play.api.libs.json.{JsValue, Json, Reads, Writes}
 import limero._
 import akka.pattern.ask
-
-
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence
 
 object MqttStream {
+  val log = LoggerFactory.getLogger(classOf[MqttStream])
 
   def main(args: Array[String]): Unit = {
     val decider: Supervision.Decider = {
@@ -29,79 +27,55 @@ object MqttStream {
       case _ => Supervision.Stop
     }
     implicit val system = ActorSystem()
-
     implicit val materializer = ActorMaterializer(ActorMaterializerSettings(system)
       .withSupervisionStrategy(decider))
     implicit val loggingAdapter = system.log
     implicit val askTimeout = Timeout(5, TimeUnit.SECONDS)
 
-
-    val ms = new MqttStream("tcp://limero.local:1883");
-
-    /*    val jsv: JsValue = Json.parse("""{"x":10,"y":100,"id":1234,"distance":1.234,"location":{"x":10,"y":101}}""")
-
-        val anchor = jsv.as[AnchorDistance]*/
-
-    val tril: ActorRef = system.actorOf(Props[Trilateration], "trilateration")
-
+    val ms = new MqttStream("tcp://limero.ddns.net:1883");
 
     RunnableGraph.fromGraph(GraphDSL.create() {
       implicit builder: GraphDSL.Builder[NotUsed] =>
         import GraphDSL.Implicits._
 
-        ms.Src("remote/remote/potLeft").map(jsv => (jsv \ "value").as[Double]) ~> ms.log[Double]("potLeft")~> ms.scale(0, 1023, -5, 5, 0.1) ~> ms.threshold(0.1) ~> ms.Dst("drive/speed/targetSpeed")
-        ms.Src("remote/remote/potRight").map(jsv => (jsv \ "value").as[Double])~> ms.log[Double]("potRight") ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.negative() ~> ms.Dst("drive/steer/targetAngle")
-        ms.SrcBoolean("remote/system/alive") ~> ms.log[Boolean]("alive") ~> ms.Dst("drive/speed/keepGoing")
+        ms.Src[Boolean]("remote/system/alive") ~> ms.log[Boolean]("alive") ~> ms.Dst[Boolean]("drive/speed/keepGoing")
+        ms.Src[Double]("remote/remote/potLeft") ~> ms.log[Double]("potLeft") ~> ms.scale(0, 1023, -5, 5, 0.1) ~> ms.threshold(0.1) ~> ms.Dst[Double]("drive/speed/targetSpeed")
+        ms.Src[Double]("remote/remote/potRight") ~> ms.log[Double]("potRight") ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.negative() ~> ms.Dst[Double]("drive/steer/targetAngle")
+
         ClosedShape
     }).run()
   }
 }
 
 class MqttStream(url: String) {
-  val log = LoggerFactory.getLogger(classOf[Trilateration])
+  val log = LoggerFactory.getLogger(classOf[MqttStream])
 
 
-  val connectionSettings = MqttConnectionSettings("tcp://limero.ddns.net:1883", "", new MemoryPersistence)
+  val connectionSettings = MqttConnectionSettings(url, "", new MemoryPersistence)
     .withAutomaticReconnect(true).withCleanSession(true)
   val weight = 0.1
   var counter = 0
 
-  def SrcDouble(topic: String) = {
+
+  def Src[T: Reads](topic: String) = {
     MqttSource.atMostOnce(
       connectionSettings.withClientId(genClientId("Src-")),
       MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
       bufferSize = 8
-    ).map[Double](msg => msg.payload.utf8String.toDouble)
+    ).map[T](msg => {
+      Json.parse(msg.payload.utf8String).as[T]
+    })
   }
 
-  def SrcBoolean(topic: String) = {
-    MqttSource.atMostOnce(
-      connectionSettings.withClientId(genClientId("Src-")),
-      MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
-      bufferSize = 8
-    ).map[Boolean](msg => msg.payload.utf8String.toBoolean)
-  }
-
-  def Src(topic: String, prefix: String = "src/") = MqttSource.atMostOnce(
-    connectionSettings.withClientId(genClientId("Src-")),
-    MqttSubscriptions(Map(prefix + topic -> MqttQoS.atMostOnce)),
-    bufferSize = 8
-  ).map[JsValue](msg => {
-    var json = Json.obj("message" -> msg.payload.utf8String, "topic" -> msg.topic)
-    val jsv = Json.parse(msg.payload.utf8String)
-    json += ("value" -> jsv)
-    /*      if (jsv.isInstanceOf[JsBoolean]) json += ("boolean", jsv)
-          if (jsv.isInstanceOf[JsNumber]) json += ("double", jsv)
-          if (jsv.isInstanceOf[JsString]) json += ("string", jsv)
-          if (jsv.isInstanceOf[JsArray]) json += ("array", jsv)
-          if ( jsv.isInstanceOf[JsObject]) json += ( "object" -> jsv.as[JsObject])*/
-    json
-  })
-
-  def Dst(topic: String) = {
-    Flow[Any].map[MqttMessage](d => MqttMessage("dst/" + topic, ByteString(d.toString))).to(
+  def Dst[T: Writes](topic: String) = {
+    Flow[T].map[MqttMessage](obj => {
+      val json = Json.toJson(obj)
+      MqttMessage("dst/" + topic, ByteString(Json.stringify(json)))
+    }).to(
       MqttSink(connectionSettings.withClientId(genClientId("Dst-")), MqttQoS.AtLeastOnce))
   }
+
+
 
   def genClientId(prefix: String) = {
     counter += 1
@@ -124,7 +98,7 @@ class MqttStream(url: String) {
 
   def log[T](prefix: String): Flow[T, T, NotUsed] = Flow[T].map[T](jsv => {
 
-    log.info( prefix + " : " + jsv);
+    log.info(prefix + " : " + jsv);
     jsv
   })
 
@@ -138,8 +112,12 @@ class MqttStream(url: String) {
     Math.round((r + step / 2) / step) * step
   })
 
-  def trilateration() = Flow[AnchorDistance].map[Coordinate](ad => {
-    Coordinate(0, ad.anchor.location.y)
+  def trilateration() = Flow[Anchor].map[Coordinate](anchor => {
+    Coordinate(anchor.location.x, anchor.location.y)
+  })
+
+  def dummyTril() = Flow[Double].map[Coordinate](anchor => {
+    Coordinate(anchor, 456)
   })
 
   def medianCalculator(seq: Seq[Int]): Int = {

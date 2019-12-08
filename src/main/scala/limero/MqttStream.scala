@@ -36,7 +36,7 @@ object MqttStream {
     implicit val askTimeout = Timeout(5, TimeUnit.SECONDS)
 
 
-    val ms = new MqttStream("tcp://limero.ddns.net:1883");
+    val ms = new MqttStream("tcp://limero.local:1883");
 
     /*    val jsv: JsValue = Json.parse("""{"x":10,"y":100,"id":1234,"distance":1.234,"location":{"x":10,"y":101}}""")
 
@@ -49,9 +49,9 @@ object MqttStream {
       implicit builder: GraphDSL.Builder[NotUsed] =>
         import GraphDSL.Implicits._
 
-        ms.Src("remote/controller/potLeft").map(jsv => (jsv \ "value").as[Double]) ~> ms.scale(0, 1023, -5, 5, 0.1) ~> ms.threshold(0.1) ~> ms.Dst("drive/motor/targetSpeed")
-        ms.Src("remote/controller/potRight").map(jsv => (jsv \ "value").as[Double])~> ms.log[Double]("potRight") ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.Dst("drive/steer/targetAngle")
-        ms.SrcBoolean("remote/system/alive") ~> ms.log[Boolean]("alive") ~> ms.Dst("drive/motor/keepGoing")
+        ms.Src("remote/remote/potLeft").map(jsv => (jsv \ "value").as[Double]) ~> ms.log[Double]("potLeft")~> ms.scale(0, 1023, -5, 5, 0.1) ~> ms.threshold(0.1) ~> ms.Dst("drive/speed/targetSpeed")
+        ms.Src("remote/remote/potRight").map(jsv => (jsv \ "value").as[Double])~> ms.log[Double]("potRight") ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.negative() ~> ms.Dst("drive/steer/targetAngle")
+        ms.SrcBoolean("remote/system/alive") ~> ms.log[Boolean]("alive") ~> ms.Dst("drive/speed/keepGoing")
         ClosedShape
     }).run()
   }
@@ -62,7 +62,7 @@ class MqttStream(url: String) {
 
 
   val connectionSettings = MqttConnectionSettings("tcp://limero.ddns.net:1883", "", new MemoryPersistence)
-    .withAutomaticReconnect(true)
+    .withAutomaticReconnect(true).withCleanSession(true)
   val weight = 0.1
   var counter = 0
 
@@ -111,6 +111,10 @@ class MqttStream(url: String) {
   def scale(x1: Double, x2: Double, y1: Double, y2: Double) = Flow[Double].map[Double](d => {
     val r = y1 + (d - x1) * (y2 - y1) / (x2 - x1)
     (math floor r * 100) / 100
+  })
+
+  def negative() = Flow[Double].map[Double](d => {
+    -d
   })
 
   def exponentialFilter(): Flow[Double, Double, NotUsed] =

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="sbt 1" modules="MqttStreams,akkaIot-MqttStreams,akkaiot_4921,akkaiot_7577" />
+    <profile name="sbt 1" modules="MqttStreams,akkaiot_1238" />
   </component>
 </project>

@@ -4,8 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MqttStreams.iml" filepath="$PROJECT_DIR$/.idea/modules/MqttStreams.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" filepath="$PROJECT_DIR$/.idea/modules/MqttStreams-build.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/akkaIot-MqttStreams.iml" filepath="$PROJECT_DIR$/.idea/modules/akkaIot-MqttStreams.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/project-MqttStreams-build.iml" filepath="$PROJECT_DIR$/.idea/modules/project-MqttStreams-build.iml" />
     </modules>
   </component>
 </project>

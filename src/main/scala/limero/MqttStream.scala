@@ -39,8 +39,8 @@ object MqttStream {
         import GraphDSL.Implicits._
 
         ms.Src[Boolean]("remote/system/alive") ~> ms.log[Boolean]("alive") ~> ms.Dst[Boolean]("drive/speed/keepGoing")
-        ms.Src[Double]("remote/remote/potLeft") ~> ms.log[Double]("potLeft") ~> ms.scale(0, 1023, -5, 5, 0.1) ~> ms.threshold(0.1) ~> ms.Dst[Double]("drive/speed/targetSpeed")
-        ms.Src[Double]("remote/remote/potRight") ~> ms.log[Double]("potRight") ~> ms.scale(0, 1023, -90, +90, 1) ~> ms.negative() ~> ms.Dst[Double]("drive/steer/targetAngle")
+        ms.Src[Double]("remote/remote/potLeft") ~> ms.log[Double]("potLeft") ~> ms.scale(0, 1023, -180, 180, 0.1) ~> ms.threshold(0.1) ~> ms.integer ~> ms.log[Int]("rpmTarget") ~> ms.Dst[Int]("drive/motor/rpmTarget")
+        ms.Src[Double]("remote/remote/potRight")  ~> ms.scale(0, 1023, -45, +45, 1) ~> ms.negative() ~> ms.Dst[Double]("drive/servo/angleTarget")
 
         ClosedShape
     }).run()
@@ -61,7 +61,7 @@ class MqttStream(url: String) {
     MqttSource.atMostOnce(
       connectionSettings.withClientId(genClientId("Src-")),
       MqttSubscriptions(Map("src/" + topic -> MqttQoS.atMostOnce)),
-      bufferSize = 8
+      bufferSize = 1
     ).map[T](msg => {
       Json.parse(msg.payload.utf8String).as[T]
     })
@@ -72,7 +72,7 @@ class MqttStream(url: String) {
       val json = Json.toJson(obj)
       MqttMessage("dst/" + topic, ByteString(Json.stringify(json)))
     }).to(
-      MqttSink(connectionSettings.withClientId(genClientId("Dst-")), MqttQoS.AtLeastOnce))
+      MqttSink(connectionSettings.withClientId(genClientId("Dst-")), MqttQoS.AtMostOnce))
   }
 
 
@@ -90,6 +90,10 @@ class MqttStream(url: String) {
   def negative() = Flow[Double].map[Double](d => {
     -d
   })
+  def integer() = Flow[Double].map[Int](d => {
+    d.toInt
+  })
+
 
   def exponentialFilter(): Flow[Double, Double, NotUsed] =
     Flow[Double].scan(0.0)(
